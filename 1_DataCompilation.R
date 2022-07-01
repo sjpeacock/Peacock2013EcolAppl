@@ -35,7 +35,7 @@ for(i in 1:length(Yr)){
 	Area[i]<-z$Area[z$River==River[i]][1]
 }
 
-z<-data.frame(Area, River=as.numeric(River), RiverName=River, Yr, Escapement)
+z<-data.frame(Area, River=as.numeric(as.factor(River)), RiverName=River, Yr, Escapement)
 
 cat("Total number of rivers in nuSEDS data: ", length(unique(z$River)))
 
@@ -161,7 +161,7 @@ x<-zz
 #-------------------------------------------------------------------------------
 
 # a) Enter a row of NA for each missing year
-L<-levels(z$River);
+L<-levels(as.factor(z$River));
 yr1<-c(); area1<-c(); river1<-c(); 
 
 for(i in 1:length(L)){
@@ -239,35 +239,62 @@ ZZ$Popn<-factor(ZZ$Popn);
 # 4) Only keep populations with a minimum of 20 spawner-recruit pairs
 #-------------------------------------------------------------------------------
 
-Min.N<-20; Z.lengths<-c(); L<-unique(ZZ$Popn); 
-for(i in 1:length(L)){
-	z1<-subset(ZZ,Popn==L[i]);	
-	z2<-which(is.na(z1$Survival)); 
-	Z.lengths[i]<-length(z1$S)-length(z2);
-	}
+# Min.N<-20; Z.lengths<-c(); L<-unique(ZZ$Popn); 
+# for(i in 1:length(L)){
+# 	z1<-subset(ZZ,Popn==L[i]);	
+# 	z2<-which(is.na(z1$Survival)); 
+# 	Z.lengths[i]<-length(z1$S)-length(z2);
+# 	}
+# 
+# R.LongEnough<-which(Z.lengths>=20)
+# R.River<-c(); R.Area<-c();
+# for(i in 1:length(R.LongEnough)){
+# 	z1<-subset(ZZ,Popn==R.LongEnough[i])
+# 	R.Area<-c(R.Area, z1$Area[1])
+# 	R.River<-c(R.River, z1$Popn[1])
+# 	}
 
-R.LongEnough<-which(Z.lengths>=20)
-R.River<-c(); R.Area<-c();
-for(i in 1:length(R.LongEnough)){
-	z1<-subset(ZZ,Popn==R.LongEnough[i])
-	R.Area<-c(R.Area,z1$Area[1])
-	R.River<-c(R.River,z1$Popn[1])
-	}
+# *****************************************************************************
+# *** Note this was the step that was not done in original 2013 paper ***
+# Subset data 
+# *****************************************************************************
 
 #Separate out even and odd year populations 
 ZZ$Population<-as.factor(paste(ZZ$River, ZZ$EO, sep=" "))
+ZZ$LongEnough <- rep(0, nrow(ZZ))
 
-#Only keep those entries with estimates of survival
+Populations <- unique(ZZ$Population)
+for(i in 1:length(Populations)){
+	ZZ.i <- ZZ[which(ZZ$Population == Populations[i]), ]
+	if(sum(is.na(ZZ.i$Survival) == FALSE) >= 20){
+		ZZ$LongEnough[which(ZZ$Population == Populations[i])] <- 1
+	}
+}
+
+# Min.N<-20; Z.lengths<-c(); L<-unique(ZZ$Popn); 
+# for(i in 1:length(L)){
+# 	z1<-subset(ZZ,Popn==L[i]);	
+# 	z2<-which(is.na(z1$Survival)); 
+# 	Z.lengths[i]<-length(z1$S)-length(z2);
+# 	}
+
+# *****************************************************************************
+
+
+# Only keep those entries with estimates of survival
 Z1<-subset(ZZ, is.na(ZZ$Survival)==FALSE)
 
 cat("Final dataset: \n Total number of populations (even/odd): ", length(unique(Z1$Population)), "\n Total number of S-R pairs: ", dim(Z1)[1], "\n Total number of rivers: ", length(unique(Z1$River)))
+
+cat("Final *subsetted* dataset: \n Total number of populations (even/odd): ", length(unique(Z1$Population[Z1$LongEnough == 1])), "\n Total number of S-R pairs: ", dim(Z1[Z1$LongEnough == 1, ])[1], "\n Total number of rivers: ", length(unique(Z1$River[Z1$LongEnough == 1])))
+
 
 ################################################################################
 ## C. Inclusion of louse covariate data
 ################################################################################
 
 # Wild lice estimates
-W<-data.frame(return.year=c(2001:2010)+1, mean=c(12.1739692,6.228714679,0.692532577,6.226036908,2.657006199,0.906920939,0.869532124,0.390081339,0.202908529,0.627256331))
+W <- data.frame(return.year=c(2001:2010)+1, mean=c(12.1739692,6.228714679,0.692532577,6.226036908,2.657006199,0.906920939,0.869532124,0.390081339,0.202908529,0.627256331))
 
 Z1$WildLice<-rep(0,dim(Z1)[1])
 for(i in 1:dim(W)[1]){
