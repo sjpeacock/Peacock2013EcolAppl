@@ -12,6 +12,15 @@ Details of the analysis of pink salmon population data, including
 spawner and catch data and R code for compiling spawner-recruit pairs
 and fitting the Ricker model.
 
+**August 2022**: The file `Correction.R` has been added to correct an
+error in the reporting of methods in the original 2013 paper.
+Specifically, the original analysis reported results from the full data
+set, without filtering based on the number of spawner-recruit pairs as
+reported in the methods. The results and conclusions remained the same
+when using the filtered data set, and an erratum has been submitting
+outlining the specific changes to parameter estimates using the filtered
+data set.
+
 ## File list
 
 `nuSEDS_PINK.csv`
