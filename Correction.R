@@ -224,7 +224,7 @@ for(s in 1:2){
 	points(Z$S[Z$Area==12&Z$Yr.numeric==2004]*10^(-6), Z$Survival[Z$Area==12&Z$Yr.numeric==2004], pch=19)
 	
 	mtext(side=3, line=1, adj=0, c("(a)", "(c)")[s])
-	mtext(side = 3, line = 2.5, c("Peacock et al. (2013)", "Revised subsetted data")[s])
+	mtext(side = 3, line = 2.5, c("Peacock et al. (2013)", "Filtered data set")[s])
 	
 	text(2.5, 7, paste("Rivers: ", length(unique(Z$River)), "\nPop'ns: ", length(unique(Z$Population)), "\nSR pairs: ", nrow(Z), sep = ""), adj = 0, cex = 0.9, xpd = NA)
 	
